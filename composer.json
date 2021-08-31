@@ -1,0 +1,40 @@
+{
+    "name": "qubus/filesystem",
+    "type": "library",
+    "description": "Filesystem component.",
+    "keywords": [
+        "file",
+        "filesystem",
+        "directory"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joshua Parker",
+            "email": "josh@joshuaparker.blog",
+            "homepage": "https://joshuaparker.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "league/flysystem": "^2.2",
+        "qubus/exception": "^1.2"
+    },
+    "require-dev": {
+        "laminas/laminas-coding-standard": "^2.0",
+        "squizlabs/php_codesniffer": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Qubus\\FileSystem\\": ""
+        }
+    },
+    "scripts": {
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
