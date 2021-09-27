@@ -42,7 +42,7 @@ final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FlysystemAda
             'host'                            => $this->config->getConfigKey('filesystem.ftp.host', 'localhost'),
             'root'                            => $this->config->getConfigKey('filesystem.ftp.root', '/var/www/'),
             'username'                        => $this->config->getConfigKey('filesystem.ftp.username', 'root'),
-            'password'                        => $this->config->getConfigKey('filesystem.ftp.password', 'password'),
+            'password'                        => $this->config->getConfigKey('filesystem.ftp.password', 'root'),
             'port'                            => $this->config->getConfigKey('filesystem.ftp.port', 21),
             'ssl'                             => $this->config->getConfigKey('filesystem.ftp.ssl', false),
             'timeout'                         => $this->config->getConfigKey('filesystem.ftp.timeout', 90),
