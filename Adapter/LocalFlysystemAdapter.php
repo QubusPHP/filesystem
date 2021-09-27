@@ -34,7 +34,7 @@ final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implement
         $this->config = $config;
 
         parent::__construct(
-            $this->config->getConfigKey('filesystem.local.root'),
+            $this->config->getConfigKey('filesystem.local.root', '/var/www'),
             PortableVisibilityConverter::fromArray($this->setVisibilityConverter()),
             $writeFlags,
             $linkHandling,
