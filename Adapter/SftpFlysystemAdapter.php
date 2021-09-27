@@ -40,9 +40,9 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FlysystemA
     private function setSftpConnectionProvider(): SftpConnectionProvider
     {
         return new SftpConnectionProvider(
-            $this->config->getConfigKey('filesystem.sftp.host'),
-            $this->config->getConfigKey('filesystem.sftp.username'),
-            $this->config->getConfigKey('filesystem.sftp.password', null),
+            $this->config->getConfigKey('filesystem.sftp.host', 'localhosat'),
+            $this->config->getConfigKey('filesystem.sftp.username', 'root'),
+            $this->config->getConfigKey('filesystem.sftp.password', 'root'),
             $this->config->getConfigKey('filesystem.sftp.privatekey', null),
             $this->config->getConfigKey('filesystem.sftp.passphrase', null),
             $this->config->getConfigKey('filesystem.sftp.port', 22),
