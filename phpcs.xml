@@ -12,7 +12,8 @@
     <arg value="p"/>
 
     <!-- Paths to check -->
-    <file>./File.php</file>
+    <file>./FileSystem.php</file>
+    <file>./Adapter</file>
 
     <!-- Additional QubusPHP Coding Standard rules. -->
 
@@ -105,6 +106,11 @@
     <!-- The Yoda comparison CAN be used. -->
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison">
         <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison.DisallowedYodaComparison"/>
+    </rule>
+
+    <!-- @author and @copyright Annotations can be used. -->
+    <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
+        <exclude name="SlevomatCodingStandard.Commenting.ForbiddenAnnotations"/>
     </rule>
 
     <!-- File names should be lowercased and class names should be uppercase. -->

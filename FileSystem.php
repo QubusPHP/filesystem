@@ -4,7 +4,7 @@
  * Qubus\FileSystem
  *
  * @link       https://github.com/QubusPHP/filesystem
- * @copyright  2021 Joshua Parker
+ * @copyright  2021 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace Qubus\FileSystem;
 
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Filesystem as LeagueFileSystem;
 use League\Flysystem\PathNormalizer;
 use Qubus\Exception\Exception;
 use Qubus\Exception\Http\Client\NotFoundException;
 use Qubus\Exception\IO\IOException;
+use Qubus\FileSystem\Adapter\FlysystemAdapter;
 
 use function array_values;
 use function curl_close;
@@ -50,9 +50,9 @@ use const DIRECTORY_SEPARATOR;
 use const FILE_APPEND;
 use const LOCK_EX;
 
-class File extends Filesystem
+class FileSystem extends LeagueFileSystem
 {
-    /** @var FilesystemAdapter */
+    /** @var FlysystemAdapter */
     private $adapter;
 
     /** @var Config */
@@ -62,7 +62,7 @@ class File extends Filesystem
     private $pathNormalizer;
 
     public function __construct(
-        FilesystemAdapter $adapter,
+        FlysystemAdapter $adapter,
         array $config = [],
         ?PathNormalizer $pathNormalizer = null
     ) {
@@ -78,7 +78,7 @@ class File extends Filesystem
      * @param bool $context Whether or not to use a context resource.
      * @return string|false
      */
-    public function getContents(string $filename, bool $useIncludePath = false, bool $context = true)
+    public function getContents(string $filename, bool $useIncludePath = false, bool $context = true): string|bool
     {
         $opts = [
             'http' => [
@@ -182,7 +182,7 @@ class File extends Filesystem
      * @param bool $throw       Determines whether to do a simple check or throw an exception.
      *                          Default: true.
      * @return bool             True if the file or directory specified by $filename exists;
-     *                          false otherwise.
+     *                          false otherwise if $throw is set to false.
      * @throws NotFoundException If file does not exist.
      */
     public function exists(string $filename, bool $throw = true): bool
@@ -199,17 +199,17 @@ class File extends Filesystem
     /**
      * Get an array that represents directory tree.
      *
-     * @param string $dir   Directory path
-     * @param string $bool  Include sub directories
+     * @param string $dir  Directory path.
+     * @param string $bool Include sub directories. Default: dirs. Option: files.
      * @return string
      */
-    public function directoryListing(string $dir, string $bool = "dirs")
+    public function directoryListing(string $dir, string $include = 'dirs')
     {
         $truedir = $dir;
         $dir = scandir($dir);
-        if ($bool === "files") { // dynamic function based on second pram
+        if ($include === 'files') { // dynamic function based on second param
             $direct = 'is_dir';
-        } elseif ($bool === "dirs") {
+        } elseif ($include === 'dirs') {
             $direct = 'is_file';
         }
         foreach ($dir as $k => $v) {
