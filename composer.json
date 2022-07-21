@@ -12,19 +12,18 @@
     "authors": [
         {
             "name": "Joshua Parker",
-            "email": "josh@joshuaparker.blog",
-            "homepage": "https://joshuaparker.dev"
+            "email": "josh@joshuaparker.blog"
         }
     ],
     "require": {
-        "php": "^8.0",
-        "league/flysystem": "^2.3",
-        "league/flysystem-aws-s3-v3": "^2.1",
-        "league/flysystem-ftp": "^2.3",
-        "league/flysystem-memory": "^2.0",
-        "league/flysystem-sftp": "^2.2",
-        "qubus/config": "^1",
-        "qubus/exception": "^1"
+        "php": "^8.1",
+        "league/flysystem": "^3.1",
+        "league/flysystem-aws-s3-v3": "^3.1",
+        "league/flysystem-ftp": "^3.1",
+        "league/flysystem-memory": "^3.1",
+        "league/flysystem-sftp": "^3.1",
+        "qubus/config": "^2.0",
+        "qubus/exception": "^2.0"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.0",
