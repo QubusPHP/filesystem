@@ -23,16 +23,12 @@ use const LOCK_EX;
 
 final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implements FlysystemAdapter
 {
-    private ConfigContainer $config;
-
     public function __construct(
-        ConfigContainer $config,
+        public readonly ConfigContainer $config,
         int $writeFlags = LOCK_EX,
         int $linkHandling = self::DISALLOW_LINKS,
         ?MimeTypeDetector $mimeTypeDetector = null
     ) {
-        $this->config = $config;
-
         parent::__construct(
             $this->config->getConfigKey('filesystem.local.root', '/var/www'),
             PortableVisibilityConverter::fromArray($this->setVisibilityConverter()),

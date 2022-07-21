@@ -50,7 +50,7 @@ use const DIRECTORY_SEPARATOR;
 use const FILE_APPEND;
 use const LOCK_EX;
 
-class FileSystem extends LeagueFileSystem
+final class FileSystem extends LeagueFileSystem
 {
     /** @var FlysystemAdapter */
     private $adapter;
@@ -76,7 +76,7 @@ class FileSystem extends LeagueFileSystem
      * @param string $filename Resource to read.
      * @param bool $useIncludePath Whether or not to use include path.
      * @param bool $context Whether or not to use a context resource.
-     * @return string|false
+     * @return string|bool
      */
     public function getContents(string $filename, bool $useIncludePath = false, bool $context = true): string|bool
     {

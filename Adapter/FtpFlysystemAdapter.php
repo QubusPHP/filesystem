@@ -22,12 +22,8 @@ use const FTP_BINARY;
 
 final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FlysystemAdapter
 {
-    private ConfigContainer $config;
-
-    public function __construct(ConfigContainer $config)
+    public function __construct(public readonly ConfigContainer $config)
     {
-        $this->config = $config;
-
         parent::__construct(FtpConnectionOptions::fromArray($this->setFtpConnectionOptions()));
     }
 

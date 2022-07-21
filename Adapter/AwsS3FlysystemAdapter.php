@@ -22,9 +22,10 @@ use Qubus\Config\ConfigContainer;
 
 final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements FlysystemAdapter
 {
-    private ConfigContainer $config;
-
-    public function __construct(S3ClientInterface $client, ConfigContainer $config)
+    public function __construct(
+        S3ClientInterface $client,
+        public readonly ConfigContainer $config
+    )
     {
         $this->config = $config;
 

@@ -21,12 +21,8 @@ use Qubus\Config\ConfigContainer;
 
 final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FlysystemAdapter
 {
-    private ConfigContainer $config;
-
-    public function __construct(ConfigContainer $config)
+    public function __construct(public readonly ConfigContainer $config)
     {
-        $this->config = $config;
-
         parent::__construct(
             $this->setSftpConnectionProvider(),
             $this->config->getConfigKey('filesystem.sftp.root', '/var/www'),
