@@ -14,13 +14,18 @@ declare(strict_types=1);
 
 namespace Qubus\FileSystem\Adapter;
 
-use League\Flysystem\PhpseclibV2\SftpAdapter as LeagueSftpAdapter;
-use League\Flysystem\PhpseclibV2\SftpConnectionProvider;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\PhpseclibV3\SftpAdapter as LeagueSftpAdapter;
+use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use Qubus\Config\ConfigContainer;
+use Qubus\Exception\Exception;
 
-final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FlysystemAdapter
+final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FilesystemAdapter
 {
+    /**
+     * @throws Exception
+     */
     public function __construct(public readonly ConfigContainer $config)
     {
         parent::__construct(
@@ -32,11 +37,12 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FlysystemA
 
     /**
      * The FTP connection provider options.
+     * @throws Exception
      */
     private function setSftpConnectionProvider(): SftpConnectionProvider
     {
         return new SftpConnectionProvider(
-            $this->config->getConfigKey('filesystem.sftp.host', 'localhosat'),
+            $this->config->getConfigKey('filesystem.sftp.host', 'localhost'),
             $this->config->getConfigKey('filesystem.sftp.username', 'root'),
             $this->config->getConfigKey('filesystem.sftp.password', 'root'),
             $this->config->getConfigKey('filesystem.sftp.privatekey', null),
@@ -54,6 +60,7 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements FlysystemA
      * The directory and file visibility options.
      *
      * @return array
+     * @throws Exception
      */
     private function setVisibilityConverter(): array
     {

@@ -14,14 +14,19 @@ declare(strict_types=1);
 
 namespace Qubus\FileSystem\Adapter;
 
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter as LeagueFtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use Qubus\Config\ConfigContainer;
+use Qubus\Exception\Exception;
 
 use const FTP_BINARY;
 
-final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FlysystemAdapter
+final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FilesystemAdapter
 {
+    /**
+     * @throws Exception
+     */
     public function __construct(public readonly ConfigContainer $config)
     {
         parent::__construct(FtpConnectionOptions::fromArray($this->setFtpConnectionOptions()));
@@ -31,6 +36,7 @@ final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FlysystemAda
      * FTP connection options.
      *
      * @return array
+     * @throws Exception
      */
     private function setFtpConnectionOptions(): array
     {

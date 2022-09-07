@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Qubus\FileSystem;
 
 use League\Flysystem\Filesystem as LeagueFileSystem;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
 use Qubus\Exception\Exception;
 use Qubus\Exception\Http\Client\NotFoundException;
-use Qubus\Exception\IO\IOException;
-use Qubus\FileSystem\Adapter\FlysystemAdapter;
+use Qubus\Exception\IO\FileSystem\DirectoryNotWritableException;
 
 use function array_values;
 use function curl_close;
@@ -52,17 +52,17 @@ use const LOCK_EX;
 
 final class FileSystem extends LeagueFileSystem
 {
-    /** @var FlysystemAdapter */
-    private $adapter;
+    /** @var FilesystemAdapter */
+    private FilesystemAdapter $adapter;
 
-    /** @var Config */
-    private $config;
+    /** @var array */
+    private array $config;
 
-    /** @var PathNormalizer */
-    private $pathNormalizer;
+    /** @var ?PathNormalizer */
+    private ?PathNormalizer $pathNormalizer = null;
 
     public function __construct(
-        FlysystemAdapter $adapter,
+        FilesystemAdapter $adapter,
         array $config = [],
         ?PathNormalizer $pathNormalizer = null
     ) {
@@ -131,7 +131,8 @@ final class FileSystem extends LeagueFileSystem
      * @param int $permissions Permission to set for directory.
      * @param bool $recursive Whether to allow the creation of nested directories.
      * @return bool True if the directory was created.
-     * @throws IOException If path is not writable, or lacks permission to mkdir.
+     * @throws DirectoryNotWritableException If path is not writable, or lacks permission to mkdir.
+     * @throws Exception If path is invalid.
      */
     public function mkdir(string $path, int $permissions = 0755, bool $recursive = true): bool
     {
@@ -141,7 +142,7 @@ final class FileSystem extends LeagueFileSystem
 
         if (! is_dir($path)) {
             if (! @mkdir($path, $permissions, $recursive)) {
-                throw new IOException(
+                throw new DirectoryNotWritableException(
                     sprintf(
                         'The following directory could not be created: %s',
                         $path
