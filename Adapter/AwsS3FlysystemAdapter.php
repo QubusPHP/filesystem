@@ -17,18 +17,21 @@ namespace Qubus\FileSystem\Adapter;
 use Aws\S3\S3ClientInterface;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as LeagueAwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Visibility;
 use Qubus\Config\ConfigContainer;
+use Qubus\Exception\Exception;
 
-final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements FlysystemAdapter
+final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements FilesystemAdapter
 {
+    /**
+     * @throws Exception
+     */
     public function __construct(
         S3ClientInterface $client,
         public readonly ConfigContainer $config
     )
     {
-        $this->config = $config;
-
         parent::__construct(
             $client,
             $this->config->getConfigKey('filesystem.awsS3.bucket'),
