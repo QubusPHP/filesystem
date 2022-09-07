@@ -14,15 +14,21 @@ declare(strict_types=1);
 
 namespace Qubus\FileSystem\Adapter;
 
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LeagueLocalFileSystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\MimeTypeDetection\MimeTypeDetector;
 use Qubus\Config\ConfigContainer;
 
+use Qubus\Exception\Exception;
+
 use const LOCK_EX;
 
-final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implements FlysystemAdapter
+final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implements FilesystemAdapter
 {
+    /**
+     * @throws Exception
+     */
     public function __construct(
         public readonly ConfigContainer $config,
         int $writeFlags = LOCK_EX,
@@ -42,6 +48,7 @@ final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implement
      * The directory and file visibility options.
      *
      * @return array
+     * @throws Exception
      */
     private function setVisibilityConverter(): array
     {
