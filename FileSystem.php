@@ -63,10 +63,10 @@ final class FileSystem extends LeagueFileSystem
 
     public function __construct(
         FilesystemAdapter $adapter,
-        array $config = [],
+        array $configArray = [],
         ?PathNormalizer $pathNormalizer = null
     ) {
-        parent::__construct($adapter, $config, $pathNormalizer);
+        parent::__construct($adapter, $configArray, $pathNormalizer);
     }
 
     /**
