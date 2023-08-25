@@ -12,23 +12,23 @@
     "authors": [
         {
             "name": "Joshua Parker",
-            "email": "josh@joshuaparker.blog"
+            "email": "joshua@joshuaparker.dev"
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "ext-curl": "*",
         "ext-ftp": "*",
-        "league/flysystem": "^3.1",
-        "league/flysystem-aws-s3-v3": "^3.1",
-        "league/flysystem-ftp": "^3.1",
-        "league/flysystem-memory": "^3.1",
-        "league/flysystem-sftp-v3": "^3.2",
-        "qubus/config": "^2.0",
-        "qubus/exception": "^2.0"
+        "league/flysystem": "^3",
+        "league/flysystem-aws-s3-v3": "^3",
+        "league/flysystem-ftp": "^3",
+        "league/flysystem-memory": "^3",
+        "league/flysystem-sftp-v3": "^3",
+        "qubus/config": "^3",
+        "qubus/exception": "^3"
     },
     "require-dev": {
-        "laminas/laminas-coding-standard": "^2.0",
+        "qubus/qubus-coding-standard": "^1.1",
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
