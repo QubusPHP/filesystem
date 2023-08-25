@@ -4,10 +4,9 @@
  * Qubus\FileSystem
  *
  * @link       https://github.com/QubusPHP/filesystem
- * @copyright  2021 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2021
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -74,8 +73,8 @@ final class FileSystem extends LeagueFileSystem
      * if curl is not available.
      *
      * @param string $filename Resource to read.
-     * @param bool $useIncludePath Whether or not to use include path.
-     * @param bool $context Whether or not to use a context resource.
+     * @param bool $useIncludePath Whether to use include path.
+     * @param bool $context Whether to use a context resource.
      * @return string|bool
      */
     public function getContents(string $filename, bool $useIncludePath = false, bool $context = true): string|bool
@@ -159,7 +158,7 @@ final class FileSystem extends LeagueFileSystem
      *
      * @param string $dir Directory that should be removed.
      */
-    public function rmdir(string $dir)
+    public function rmdir(string $dir): void
     {
         if (is_dir($dir)) {
             $objects = scandir($dir);
@@ -200,11 +199,11 @@ final class FileSystem extends LeagueFileSystem
     /**
      * Get an array that represents directory tree.
      *
-     * @param string $dir  Directory path.
-     * @param string $bool Include sub directories. Default: dirs. Option: files.
-     * @return string
+     * @param string $dir Directory path.
+     * @param string $include Include sub directories. Default: dirs. Option: files.
+     * @return array
      */
-    public function directoryListing(string $dir, string $include = 'dirs')
+    public function directoryListing(string $dir, string $include = 'dirs'): array
     {
         $truedir = $dir;
         $dir = scandir($dir);
@@ -266,6 +265,7 @@ final class FileSystem extends LeagueFileSystem
 
     /**
      * Prepends data to a file.
+     * @throws NotFoundException
      */
     public function prepend(string $path, string $data): bool
     {
@@ -280,6 +280,7 @@ final class FileSystem extends LeagueFileSystem
 
     /**
      * Appends data to a file.
+     * @throws NotFoundException
      */
     public function append(string $path, string $data): bool
     {
@@ -294,6 +295,7 @@ final class FileSystem extends LeagueFileSystem
 
     /**
      * Updates a file.
+     * @throws NotFoundException
      */
     public function update(string $path, string $data): bool
     {

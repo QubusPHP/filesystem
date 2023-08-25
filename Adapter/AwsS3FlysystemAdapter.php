@@ -4,10 +4,9 @@
  * Qubus\FileSystem
  *
  * @link       https://github.com/QubusPHP/filesystem
- * @copyright  2021 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2021
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.1.0
  */
 
 declare(strict_types=1);
@@ -30,8 +29,7 @@ final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements Filesy
     public function __construct(
         S3ClientInterface $client,
         public readonly ConfigContainer $config
-    )
-    {
+    ) {
         parent::__construct(
             $client,
             $this->config->getConfigKey('filesystem.awsS3.bucket'),
