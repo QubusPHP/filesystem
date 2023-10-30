@@ -25,6 +25,6 @@ final class InMemoryFlysystemAdapter extends LeagueInMemoryFilesystemAdapter imp
      */
     public function __construct(ConfigContainer $config)
     {
-        parent::__construct($config->getConfigKey('filesystem.inmemory.visibility', 'public'));
+        parent::__construct($config->getConfigKey('filesystem.disks.inmemory.visibility', 'public'));
     }
 }
