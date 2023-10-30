@@ -29,7 +29,7 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements Filesystem
     {
         parent::__construct(
             $this->setSftpConnectionProvider(),
-            $this->config->getConfigKey('filesystem.sftp.root', '/var/www'),
+            $this->config->getConfigKey('filesystem.disks.sftp.root', '/var/www'),
             PortableVisibilityConverter::fromArray($this->setVisibilityConverter())
         );
     }
@@ -41,17 +41,17 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements Filesystem
     private function setSftpConnectionProvider(): SftpConnectionProvider
     {
         return new SftpConnectionProvider(
-            $this->config->getConfigKey('filesystem.sftp.host', 'localhost'),
-            $this->config->getConfigKey('filesystem.sftp.username', 'root'),
-            $this->config->getConfigKey('filesystem.sftp.password', 'root'),
-            $this->config->getConfigKey('filesystem.sftp.privatekey', null),
-            $this->config->getConfigKey('filesystem.sftp.passphrase', null),
-            $this->config->getConfigKey('filesystem.sftp.port', 22),
-            $this->config->getConfigKey('filesystem.sftp.useagent', false),
-            $this->config->getConfigKey('filesystem.sftp.timeout', 10),
-            $this->config->getConfigKey('filesystem.sftp.maxtries', 4),
-            $this->config->getConfigKey('filesystem.sftp.fingerprint', null),
-            $this->config->getConfigKey('filesystem.sftp.connectivity', null)
+            $this->config->getConfigKey('filesystem.disks.sftp.host', 'localhost'),
+            $this->config->getConfigKey('filesystem.disks.sftp.username', 'root'),
+            $this->config->getConfigKey('filesystem.disks.sftp.password', 'root'),
+            $this->config->getConfigKey('filesystem.disks.sftp.privatekey', null),
+            $this->config->getConfigKey('filesystem.disks.sftp.passphrase', null),
+            $this->config->getConfigKey('filesystem.disks.sftp.port', 22),
+            $this->config->getConfigKey('filesystem.disks.sftp.useagent', false),
+            $this->config->getConfigKey('filesystem.disks.sftp.timeout', 10),
+            $this->config->getConfigKey('filesystem.disks.sftp.maxtries', 4),
+            $this->config->getConfigKey('filesystem.disks.sftp.fingerprint', null),
+            $this->config->getConfigKey('filesystem.disks.sftp.connectivity', null)
         );
     }
 
@@ -65,12 +65,12 @@ final class SftpFlysystemAdapter extends LeagueSftpAdapter implements Filesystem
     {
         return [
             'file' => [
-                'public'  => $this->config->getConfigKey('filesystem.sftp.visibility.file.public', 0644),
-                'private' => $this->config->getConfigKey('filesystem.sftp.visibility.file.private', 0600),
+                'public'  => $this->config->getConfigKey('filesystem.disks.sftp.permission.file.public', 0644),
+                'private' => $this->config->getConfigKey('filesystem.disks.sftp.permission.file.private', 0600),
             ],
             'dir'  => [
-                'public'  => $this->config->getConfigKey('filesystem.sftp.visibility.dir.public', 0755),
-                'private' => $this->config->getConfigKey('filesystem.sftp.visibility.dir.private', 0700),
+                'public'  => $this->config->getConfigKey('filesystem.disks.sftp.permission.dir.public', 0755),
+                'private' => $this->config->getConfigKey('filesystem.disks.sftp.permission.dir.private', 0700),
             ],
         ];
     }

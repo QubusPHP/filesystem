@@ -35,7 +35,7 @@ final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implement
         ?MimeTypeDetector $mimeTypeDetector = null
     ) {
         parent::__construct(
-            $location ?? $this->config->getConfigKey('filesystem.local.root', '/var/www'),
+            $location ?? $this->config->getConfigKey('filesystem.disks.local.root', '/var/www'),
             PortableVisibilityConverter::fromArray($this->setVisibilityConverter()),
             $writeFlags,
             $linkHandling,
@@ -53,12 +53,12 @@ final class LocalFlysystemAdapter extends LeagueLocalFileSystemAdapter implement
     {
         return [
             'file' => [
-                'public'  => $this->config->getConfigKey('filesystem.local.visibility.file.public', 0644),
-                'private' => $this->config->getConfigKey('filesystem.local.visibility.file.private', 0600),
+                'public'  => $this->config->getConfigKey('filesystem.disks.local.permission.file.public', 0644),
+                'private' => $this->config->getConfigKey('filesystem.disks.local.permission.file.private', 0600),
             ],
             'dir'  => [
-                'public'  => $this->config->getConfigKey('filesystem.local.visibility.dir.public', 0755),
-                'private' => $this->config->getConfigKey('filesystem.local.visibility.dir.private', 0700),
+                'public'  => $this->config->getConfigKey('filesystem.disks.local.permission.dir.public', 0755),
+                'private' => $this->config->getConfigKey('filesystem.disks.local.permission.dir.private', 0700),
             ],
         ];
     }
