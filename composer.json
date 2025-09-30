@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-curl": "*",
         "ext-ftp": "*",
         "league/flysystem": "^3",
@@ -24,12 +24,11 @@
         "league/flysystem-ftp": "^3",
         "league/flysystem-memory": "^3",
         "league/flysystem-sftp-v3": "^3",
-        "qubus/config": "^3",
-        "qubus/exception": "^3"
+        "qubus/config": "^4",
+        "qubus/exception": "^4"
     },
     "require-dev": {
-        "qubus/qubus-coding-standard": "^1.1",
-        "squizlabs/php_codesniffer": "^3.5"
+        "qubus/qubus-coding-standard": "^2"
     },
     "autoload": {
         "psr-4": {
@@ -44,7 +43,8 @@
         "optimize-autoloader": true,
         "sort-packages": true,
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "pestphp/pest-plugin": true
         }
     }
 }
