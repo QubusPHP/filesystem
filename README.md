@@ -4,7 +4,7 @@ Filesystem abstraction based on League Flysystem.
 
 
 ## Requirements
-PHP 8.2+
+PHP 8.4+
 
 ## Installation
 ```
