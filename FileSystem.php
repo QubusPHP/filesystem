@@ -120,6 +120,19 @@ final class FileSystem extends LeagueFileSystem
     }
 
     /**
+     * Write the contents of a file.
+     *
+     * @param string $path
+     * @param string $contents
+     * @param bool   $lock
+     * @return int|bool
+     */
+    public function putContents(string $path, string $contents, bool $lock = false): int|bool
+    {
+        return file_put_contents(filename: $path, data: $contents, flags: $lock ? LOCK_EX : 0);
+    }
+
+    /**
      * Custom make directory function.
      *
      * This function will check if the path is an existing directory,
