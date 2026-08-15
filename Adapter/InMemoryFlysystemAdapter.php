@@ -17,6 +17,7 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter as LeagueInMemoryFilesystemAdapter;
 use Qubus\Config\ConfigContainer;
 use Qubus\Exception\Exception;
+use Qubus\FileSystem\ConfigValue;
 
 final class InMemoryFlysystemAdapter extends LeagueInMemoryFilesystemAdapter implements FilesystemAdapter
 {
@@ -25,6 +26,6 @@ final class InMemoryFlysystemAdapter extends LeagueInMemoryFilesystemAdapter imp
      */
     public function __construct(ConfigContainer $config)
     {
-        parent::__construct($config->getConfigKey('filesystem.disks.inmemory.visibility', 'public'));
+        parent::__construct(ConfigValue::string($config, 'filesystem.disks.inmemory.visibility', 'public'));
     }
 }

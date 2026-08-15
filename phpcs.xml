@@ -14,6 +14,7 @@
     <!-- Paths to check -->
     <file>./Adapter</file>
     <file>./FileSystem.php</file>
+    <file>./tests</file>
 
     <!-- Include rules from the Qubus Coding Standard -->
     <rule ref="QubusCodingStandard"/>

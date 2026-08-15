@@ -20,6 +20,7 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Visibility;
 use Qubus\Config\ConfigContainer;
 use Qubus\Exception\Exception;
+use Qubus\FileSystem\ConfigValue;
 
 final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements FilesystemAdapter
 {
@@ -32,10 +33,10 @@ final class AwsS3FlysystemAdapter extends LeagueAwsS3V3Adapter implements Filesy
     ) {
         parent::__construct(
             $client,
-            $this->config->getConfigKey('filesystem.disks.awsS3.bucket'),
-            $this->config->getConfigKey('filesystem.disks.awsS3.prefix'),
+            ConfigValue::string($this->config, 'filesystem.disks.awsS3.bucket'),
+            ConfigValue::string($this->config, 'filesystem.disks.awsS3.prefix'),
             new PortableVisibilityConverter(
-                $this->config->getConfigKey('filesystem.disks.awsS3.visibility', Visibility::PUBLIC)
+                ConfigValue::string($this->config, 'filesystem.disks.awsS3.visibility', Visibility::PUBLIC)
             )
         );
     }

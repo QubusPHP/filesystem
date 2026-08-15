@@ -16,56 +16,71 @@ namespace Qubus\FileSystem;
 use League\Flysystem\Filesystem as LeagueFileSystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
+use League\Flysystem\WhitespacePathNormalizer;
 use Qubus\Exception\Exception;
 use Qubus\Exception\Http\Client\NotFoundException;
 use Qubus\Exception\IO\FileSystem\DirectoryNotWritableException;
+use InvalidArgumentException;
 
 use function array_values;
-use function curl_close;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
+use function dirname;
 use function fclose;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function fopen;
+use function flock;
 use function function_exists;
+use function fseek;
+use function ftruncate;
+use function fwrite;
 use function is_dir;
+use function is_file;
+use function is_link;
+use function is_readable;
+use function is_resource;
 use function mkdir;
+use function realpath;
 use function rmdir;
 use function rtrim;
 use function scandir;
 use function sprintf;
 use function stream_context_create;
 use function stream_get_contents;
+use function str_contains;
+use function strlen;
+use function substr;
 use function trim;
 use function unlink;
 
 use const CURLOPT_CONNECTTIMEOUT;
 use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_TIMEOUT;
 use const CURLOPT_URL;
 use const DIRECTORY_SEPARATOR;
-use const FILE_APPEND;
+use const LOCK_UN;
 use const LOCK_EX;
+use const SEEK_END;
+use const SEEK_SET;
 
 final class FileSystem extends LeagueFileSystem
 {
-    /** @var FilesystemAdapter */
-    private FilesystemAdapter $adapter;
+    private PathNormalizer $pathNormalizer;
 
-    /** @var array */
-    private array $config;
-
-    /** @var ?PathNormalizer */
-    private ?PathNormalizer $pathNormalizer = null;
-
+    /**
+     * @param array<string, mixed> $configArray
+     */
     public function __construct(
         FilesystemAdapter $adapter,
         array $configArray = [],
         ?PathNormalizer $pathNormalizer = null
     ) {
-        parent::__construct($adapter, $configArray, $pathNormalizer);
+        $this->pathNormalizer = $pathNormalizer ?? new WhitespacePathNormalizer();
+
+        parent::__construct($adapter, $configArray, $this->pathNormalizer);
     }
 
     /**
@@ -91,32 +106,43 @@ final class FileSystem extends LeagueFileSystem
             $context = null;
         }
 
-        $result = file_get_contents($filename, $useIncludePath, $context);
+        $isStream = str_contains($filename, '://');
+        if (! $isStream && ! $useIncludePath && ! file_exists($filename)) {
+            return false;
+        }
 
-        if ($result) {
+        $result = @file_get_contents($filename, $useIncludePath, $context);
+
+        if ($result !== false) {
             return $result;
-        } else {
-            $handle = fopen($filename, "r", $useIncludePath, $context);
+        }
+
+        $handle = @fopen($filename, 'r', $useIncludePath, $context);
+        if (is_resource($handle)) {
             $contents = stream_get_contents($handle);
             fclose($handle);
-            if ($contents) {
+
+            if ($contents !== false) {
                 return $contents;
-            } elseif (! function_exists('curl_init')) {
-                return false;
-            } else {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $filename);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 360);
-                $output = curl_exec($ch);
-                curl_close($ch);
-                if ($output) {
-                    return $output;
-                } else {
-                    return false;
-                }
             }
         }
+
+        if (! $isStream || ! function_exists('curl_init')) {
+            return false;
+        }
+
+        $ch = curl_init();
+        if ($ch === false) {
+            return false;
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $filename);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 360);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 360);
+        $output = curl_exec($ch);
+
+        return $output;
     }
 
     /**
@@ -170,17 +196,35 @@ final class FileSystem extends LeagueFileSystem
      * Removes directory recursively along with any files.
      *
      * @param string $dir Directory that should be removed.
+     * @throws InvalidArgumentException If the path resolves to a filesystem root.
      */
     public function rmdir(string $dir): void
     {
+        if (is_link($dir)) {
+            unlink($dir);
+            return;
+        }
+
+        $resolvedPath = realpath($dir);
+        if ($resolvedPath !== false && dirname($resolvedPath) === $resolvedPath) {
+            throw new InvalidArgumentException(sprintf('Refusing to remove filesystem root "%s".', $dir));
+        }
+
         if (is_dir($dir)) {
             $objects = scandir($dir);
+            if ($objects === false) {
+                return;
+            }
+
             foreach ($objects as $object) {
                 if ($object !== "." && $object !== "..") {
-                    if (is_dir($dir . DIRECTORY_SEPARATOR . $object)) {
-                        $this->rmdir($dir . DIRECTORY_SEPARATOR . $object);
+                    $path = $dir . DIRECTORY_SEPARATOR . $object;
+                    if (is_link($path)) {
+                        unlink($path);
+                    } elseif (is_dir($path)) {
+                        $this->rmdir($path);
                     } else {
-                        unlink($dir . DIRECTORY_SEPARATOR . $object);
+                        unlink($path);
                     }
                 }
             }
@@ -210,28 +254,39 @@ final class FileSystem extends LeagueFileSystem
     }
 
     /**
-     * Get an array that represents directory tree.
+     * Get an array that represents the directory tree.
      *
      * @param string $dir Directory path.
      * @param string $include Include sub directories. Default: dirs. Option: files.
-     * @return array
+     * @return list<string>
+     * @throws NotFoundException
      */
     public function directoryListing(string $dir, string $include = 'dirs'): array
     {
-        $truedir = $dir;
-        $dir = scandir($dir);
-        if ($include === 'files') { // dynamic function based on second param
-            $direct = 'is_dir';
-        } elseif ($include === 'dirs') {
-            $direct = 'is_file';
+        if ($include !== 'files' && $include !== 'dirs') {
+            throw new InvalidArgumentException(
+                sprintf('Invalid directory listing type "%s"; expected "dirs" or "files".', $include)
+            );
         }
-        foreach ($dir as $k => $v) {
-            if (($direct($truedir . $dir[$k])) || $dir[$k] === '.' || $dir[$k] === '..') {
-                unset($dir[$k]);
+
+        $entries = is_dir($dir) && is_readable($dir) ? scandir($dir) : false;
+        if ($entries === false) {
+            throw new NotFoundException(sprintf('Directory "%s" could not be read.', $dir));
+        }
+
+        $basePath = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR;
+        foreach ($entries as $key => $entry) {
+            if (
+                $entry === '.'
+                || $entry === '..'
+                || ($include === 'files' && is_dir($basePath . $entry))
+                || ($include === 'dirs' && ! is_dir($basePath . $entry))
+            ) {
+                unset($entries[$key]);
             }
         }
-        $dir = array_values($dir);
-        return $dir;
+
+        return array_values($entries);
     }
 
     /**
@@ -278,46 +333,93 @@ final class FileSystem extends LeagueFileSystem
 
     /**
      * Prepends data to a file.
-     * @throws NotFoundException
+     *
+     * @param string $path
+     * @param string $data
+     * @return bool
      */
     public function prepend(string $path, string $data): bool
     {
-        if (! $this->exists($path, false)) {
-            return false;
-        }
-
-        $dataFile = file_put_contents($path, $data . $this->getContents($path), LOCK_EX);
-
-        return $dataFile !== false;
+        return $this->writeToExistingFile($path, $data, true, false);
     }
 
     /**
      * Appends data to a file.
-     * @throws NotFoundException
+     *
+     * @param string $path
+     * @param string $data
+     * @return bool
      */
     public function append(string $path, string $data): bool
     {
-        if (! $this->exists($path, false)) {
-            return false;
-        }
-
-        $dataFile = file_put_contents($path, $data, FILE_APPEND | LOCK_EX);
-
-        return $dataFile !== false;
+        return $this->writeToExistingFile($path, $data, false, true);
     }
 
     /**
      * Updates a file.
-     * @throws NotFoundException
+     *
+     * @param string $path
+     * @param string $data
+     * @return bool
      */
     public function update(string $path, string $data): bool
     {
-        if (! $this->exists($path, false)) {
+        return $this->writeToExistingFile($path, $data);
+    }
+
+    private function writeToExistingFile(
+        string $path,
+        string $data,
+        bool $prepend = false,
+        bool $append = false
+    ): bool {
+        if (! is_file($path)) {
             return false;
         }
 
-        $dataFile = file_put_contents($path, $data, LOCK_EX);
+        $handle = @fopen($path, $prepend ? 'r+b' : 'cb');
+        if (! is_resource($handle) || ! flock($handle, LOCK_EX)) {
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
 
-        return $dataFile !== false;
+            return false;
+        }
+
+        if ($prepend) {
+            $contents = stream_get_contents($handle);
+            if ($contents === false) {
+                flock($handle, LOCK_UN);
+                fclose($handle);
+                return false;
+            }
+
+            $data .= $contents;
+        }
+
+        $positioned = $append ? fseek($handle, 0, SEEK_END) : fseek($handle, 0, SEEK_SET);
+        if ($positioned !== 0 || (! $append && ! ftruncate($handle, 0))) {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+            return false;
+        }
+
+        $length = strlen($data);
+        $written = 0;
+        while ($written < $length) {
+            $bytes = fwrite($handle, substr($data, $written));
+            if ($bytes === false || $bytes === 0) {
+                flock($handle, LOCK_UN);
+                fclose($handle);
+                return false;
+            }
+
+            $written += $bytes;
+        }
+
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        return true;
     }
 }

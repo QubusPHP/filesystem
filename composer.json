@@ -37,7 +37,8 @@
     },
     "scripts": {
         "cs-check": "phpcs",
-        "cs-fix": "phpcbf"
+        "cs-fix": "phpcbf",
+        "test": "pest"
     },
     "config": {
         "optimize-autoloader": true,

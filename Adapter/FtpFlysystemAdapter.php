@@ -18,6 +18,7 @@ use League\Flysystem\Ftp\FtpAdapter as LeagueFtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use Qubus\Config\ConfigContainer;
 use Qubus\Exception\Exception;
+use Qubus\FileSystem\ConfigValue;
 
 use const FTP_BINARY;
 
@@ -34,29 +35,87 @@ final class FtpFlysystemAdapter extends LeagueFtpAdapter implements FilesystemAd
     /**
      * FTP connection options.
      *
-     * @return array
+     * @return array{
+     *     host: string,
+     *     root: string,
+     *     username: string,
+     *     password: string,
+     *     port: int,
+     *     ssl: bool,
+     *     timeout: int,
+     *     utf8: bool,
+     *     passive: bool,
+     *     transferMode: int,
+     *     systemType: ?string,
+     *     ignorePassiveAddress: ?bool,
+     *     timestampsOnUnixListingsEnabled: bool,
+     *     recurseManually: bool
+     * }
      * @throws Exception
      */
     private function setFtpConnectionOptions(): array
     {
         return [
-            'host'                            => $this->config->getConfigKey('filesystem.disks.ftp.host', 'localhost'),
-            'root'                            => $this->config->getConfigKey('filesystem.disks.ftp.root', '/var/www/'),
-            'username'                        => $this->config->getConfigKey('filesystem.disks.ftp.username', 'root'),
-            'password'                        => $this->config->getConfigKey('filesystem.disks.ftp.password', 'root'),
-            'port'                            => $this->config->getConfigKey('filesystem.disks.ftp.port', 21),
-            'ssl'                             => $this->config->getConfigKey('filesystem.disks.ftp.ssl', false),
-            'timeout'                         => $this->config->getConfigKey('filesystem.disks.ftp.timeout', 90),
-            'utf8'                            => $this->config->getConfigKey('filesystem.disks.ftp.utf8', false),
-            'passive'                         => $this->config->getConfigKey('filesystem.disks.ftp.passive', true),
-            'transferMode'                    => $this->config->getConfigKey('filesystem.disks.ftp.transferMode', FTP_BINARY),
-            'systemType'                      => $this->config->getConfigKey('filesystem.disks.ftp.systemType', null),
-            'ignorePassiveAddress'            => $this->config->getConfigKey(
-                'filesystem.disks.ftp.ignorePassiveAddress',
-                null
+            'host'                            => ConfigValue::string(
+                $this->config,
+                'filesystem.disks.ftp.host',
+                'localhost'
             ),
-            'timestampsOnUnixListingsEnabled' => $this->config->getConfigKey('filesystem.disks.ftp.enableTimestamps', false),
-            'recurseManually'                 => $this->config->getConfigKey('filesystem.disks.ftp.recurseManually', true),
+            'root'                            => ConfigValue::string(
+                $this->config,
+                'filesystem.disks.ftp.root',
+                '/var/www/'
+            ),
+            'username'                        => ConfigValue::string(
+                $this->config,
+                'filesystem.disks.ftp.username',
+                'root'
+            ),
+            'password'                        => ConfigValue::string(
+                $this->config,
+                'filesystem.disks.ftp.password',
+                'root'
+            ),
+            'port'                            => ConfigValue::integer($this->config, 'filesystem.disks.ftp.port', 21),
+            'ssl'                             => ConfigValue::boolean($this->config, 'filesystem.disks.ftp.ssl', false),
+            'timeout'                         => ConfigValue::integer(
+                $this->config,
+                'filesystem.disks.ftp.timeout',
+                90
+            ),
+            'utf8'                            => ConfigValue::boolean(
+                $this->config,
+                'filesystem.disks.ftp.utf8',
+                false
+            ),
+            'passive'                         => ConfigValue::boolean(
+                $this->config,
+                'filesystem.disks.ftp.passive',
+                true
+            ),
+            'transferMode'                    => ConfigValue::integer(
+                $this->config,
+                'filesystem.disks.ftp.transferMode',
+                FTP_BINARY
+            ),
+            'systemType'                      => ConfigValue::nullableString(
+                $this->config,
+                'filesystem.disks.ftp.systemType'
+            ),
+            'ignorePassiveAddress'            => ConfigValue::nullableBoolean(
+                $this->config,
+                'filesystem.disks.ftp.ignorePassiveAddress'
+            ),
+            'timestampsOnUnixListingsEnabled' => ConfigValue::boolean(
+                $this->config,
+                'filesystem.disks.ftp.enableTimestamps',
+                false
+            ),
+            'recurseManually'                 => ConfigValue::boolean(
+                $this->config,
+                'filesystem.disks.ftp.recurseManually',
+                true
+            ),
         ];
     }
 }
